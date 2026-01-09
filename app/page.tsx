@@ -17,16 +17,18 @@ export default function HomePage() {
     }
     const encodedWord = encodeURIComponent(word);
     const encodedDefine = encodeURIComponent(define);
+    const encodedEnglish = encodeURIComponent(english);
     
-    let apiUrl = `/api/og?word=${encodedWord}&define=${encodedDefine}`;
+    const origin = window.location.origin;
+    let apiUrl = `${origin}/api/og?word=${encodedWord}&define=${encodedDefine}`;
     if (english) {
-      apiUrl += `&english=${encodeURIComponent(english)}`;
+      apiUrl += `&english=${encodedEnglish}`;
     }
     setImageUrl(apiUrl);
 
-    let pageUrl = `${window.location.origin}/share?word=${encodedWord}&define=${encodedDefine}`;
+    let pageUrl = `${origin}/share?word=${encodedWord}&define=${encodedDefine}`;
     if (english) {
-      pageUrl += `&english=${encodeURIComponent(english)}`;
+      pageUrl += `&english=${encodedEnglish}`;
     }
     setShareUrl(pageUrl);
   };
