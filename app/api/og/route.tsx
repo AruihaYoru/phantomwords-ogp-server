@@ -1,8 +1,6 @@
 import { ImageResponse } from '@vercel/og';
 import { NextRequest } from 'next/server';
 
-export const runtime = 'edge';
-
 export async function GET(req: NextRequest) {
   const font = fetch(
     new URL('../../../assets/NotoSansJP-Bold.ttf', import.meta.url)
