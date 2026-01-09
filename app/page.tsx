@@ -31,7 +31,7 @@ export default function HomePage() {
     setShareUrl(pageUrl);
   };
   
-  const handleCopy = (textToCopy) => {
+  const handleCopy = (textToCopy: string) => {
     if (!textToCopy) return;
     navigator.clipboard.writeText(textToCopy).then(() => {
       setFeedback('コピーしました！');
