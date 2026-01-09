@@ -3,10 +3,9 @@ import { NextRequest } from 'next/server';
 import fs from 'fs';
 import path from 'path';
 
-export async function GET(req: NextRequest) {
-  const fontPath = path.join(process.cwd(), 'assets', 'NotoSansJP-Bold.ttf');
-  const fontData = fs.readFileSync(fontPath);
+export const runtime = 'nodejs';
 
+export async function GET(req: NextRequest) {
   const { searchParams } = req.nextUrl;
   const word = searchParams.get('word');
   const define = searchParams.get('define');
@@ -14,6 +13,15 @@ export async function GET(req: NextRequest) {
 
   if (!word || !define) {
     return new Response('Error: `word` と `define` パラメータを指定してください', { status: 400 });
+  }
+
+  let fontData;
+  try {
+    const fontPath = path.join(process.cwd(), 'public', 'fonts', 'NotoSansJP-Bold.ttf');
+    fontData = fs.readFileSync(fontPath);
+  } catch (e) {
+    console.error('Font load error:', e);
+    return new Response('Font not found. Please check public/fonts/ path.', { status: 500 });
   }
 
   return new ImageResponse(
