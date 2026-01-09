@@ -1,10 +1,11 @@
 import { ImageResponse } from '@vercel/og';
 import { NextRequest } from 'next/server';
+import fs from 'fs';
+import path from 'path';
 
 export async function GET(req: NextRequest) {
-  const font = fetch(
-    new URL('../../../assets/NotoSansJP-Bold.ttf', import.meta.url)
-  ).then((res) => res.arrayBuffer());
+  const fontPath = path.join(process.cwd(), 'assets', 'NotoSansJP-Bold.ttf');
+  const fontData = fs.readFileSync(fontPath);
 
   const { searchParams } = req.nextUrl;
   const word = searchParams.get('word');
@@ -14,8 +15,6 @@ export async function GET(req: NextRequest) {
   if (!word || !define) {
     return new Response('Error: `word` と `define` パラメータを指定してください', { status: 400 });
   }
-
-  const fontData = await font;
 
   return new ImageResponse(
     (

@@ -12,7 +12,7 @@ export default function HomePage() {
 
   const handleGenerate = () => {
     if (!word || !define) {
-      alert('単語と定義の両方を入力してください。');
+      alert('パラメータ "word" と "define" は必須です。');
       return;
     }
     const encodedWord = encodeURIComponent(word);
@@ -31,13 +31,32 @@ export default function HomePage() {
     setShareUrl(pageUrl);
   };
   
-  const handleCopy = () => {
-    if (!shareUrl) return;
-    navigator.clipboard.writeText(shareUrl).then(() => {
+  const handleCopy = (textToCopy) => {
+    if (!textToCopy) return;
+    navigator.clipboard.writeText(textToCopy).then(() => {
       setFeedback('コピーしました！');
       setTimeout(() => setFeedback(''), 2000);
     });
   };
+
+  const WarningBox = () => (
+    <div style={{
+      backgroundColor: '#fffbe5',
+      border: '1px solid #ffc107',
+      padding: '1rem',
+      marginBottom: '1.5rem',
+      borderRadius: '4px',
+      color: '#664d03'
+    }}>
+      <h3 style={{ marginTop: 0, display: 'flex', alignItems: 'center' }}>
+        <span style={{ marginRight: '8px', fontSize: '1.5rem' }}>⚠️</span>
+        デバッグ／テスト用ポータル
+      </h3>
+      <p style={{ margin: 0 }}>
+        このページは、OGP画像生成APIの内部テスト用です。入力されたパラメータは直接 <code>/api/og</code> エンドポイントに送信されます。もし誤ってこのページにアクセスした場合は、メインサイトにお戻りください。
+      </p>
+    </div>
+  );
 
   return (
     <>
@@ -45,12 +64,12 @@ export default function HomePage() {
         <div className="header-content">
           <div className="header-top-row">
             <div className="logo">
-              <h1>PhantomWords OGP Generator</h1>
-              <p className="subtitle">PhantomWords debug</p>
+              <h1>PhantomWords OGP :: デバッガー</h1>
+              <p className="subtitle">/api/og エンドポイントテスター</p>
             </div>
             <nav className="header-nav-links">
               <a href="https://aruihayoru.github.io/PhantomWords/" target="_blank" rel="noopener noreferrer">
-                PhantomWords
+                メインサイトに戻る
               </a>
             </nav>
           </div>
@@ -58,72 +77,96 @@ export default function HomePage() {
       </header>
 
       <main id="main-content">
+        <WarningBox />
+
+        {/* APIリクエストビルダー */}
         <div className="word-card">
           <div className="word-header">
-            <h2 className="word">Debug</h2>
+            <h2 className="word">APIリクエストビルダー</h2>
           </div>
-		  <p>もしあなたが意図せずこのページに来てしまった場合、今すぐ元のページに戻ってください。ここはデバッグ／テスト用ポータルです。</p>
           <div className="definition">
-            <div style={{ marginBottom: '1rem' }}>
+            <div style={{ marginBottom: '1.5rem' }}>
+              <label htmlFor="word-input" style={{ fontWeight: 'bold' }}>パラメータ: <code>word</code></label>
               <input
-                id="search-input"
+                id="word-input"
                 type="text"
                 value={word}
                 onChange={(e) => setWord(e.target.value)}
-                placeholder="Words enter here...."
-                style={{ borderRadius: '4px', width: '100%' }}
+                placeholder="'word' パラメータの値を入力"
+                style={{ borderRadius: '4px', width: '100%', marginTop: '0.5rem' }}
               />
+              <small style={{ color: 'var(--color-text-light)' }}>エンコード後: <code>{encodeURIComponent(word)}</code></small>
             </div>
-            <div style={{ marginBottom: '1rem' }}>
+            <div style={{ marginBottom: '1.5rem' }}>
+              <label htmlFor="define-input" style={{ fontWeight: 'bold' }}>パラメータ: <code>define</code></label>
               <textarea
-                id="search-input"
+                id="define-input"
                 value={define}
                 onChange={(e) => setDefine(e.target.value)}
-                placeholder="Define enter here...."
+                placeholder="'define' パラメータの値を入力"
                 rows={3}
-                style={{ borderRadius: '4px', width: '100%', resize: 'vertical' }}
+                style={{ borderRadius: '4px', width: '100%', resize: 'vertical', marginTop: '0.5rem' }}
               />
+              <small style={{ color: 'var(--color-text-light)' }}>エンコード後: <code>{encodeURIComponent(define)}</code></small>
             </div>
-            <div>
-              <label htmlFor="english-input" style={{ display: 'block', marginBottom: '0.5rem', color: 'var(--color-text-light)', fontSize: '0.9rem' }}>
-                原文 (Original Text) - オプション
-              </label>
+            <div style={{ marginBottom: '1.5rem' }}>
+              <label htmlFor="english-input" style={{ fontWeight: 'bold' }}>パラメータ: <code>english</code> (オプション)</label>
               <textarea
                 id="english-input"
                 value={english}
                 onChange={(e) => setEnglish(e.target.value)}
-                placeholder="げんぶん enter here..."
+                placeholder="'english' パラメータの値を入力"
                 rows={2}
-                style={{ borderRadius: '4px', width: '100%', resize: 'vertical' }}
+                style={{ borderRadius: '4px', width: '100%', resize: 'vertical', marginTop: '0.5rem' }}
               />
+              <small style={{ color: 'var(--color-text-light)' }}>エンコード後: <code>{encodeURIComponent(english)}</code></small>
             </div>
-            <button id="search-button" onClick={handleGenerate} style={{ borderRadius: '4px', width: '100%', marginTop: '1rem', fontSize: '1.1rem' }}>
-              OGP画像を生成
+            <button id="generate-button" onClick={handleGenerate} style={{ borderRadius: '4px', width: '100%', fontSize: '1.1rem', backgroundColor: 'var(--color-accent)', color: 'white' }}>
+              実行して画像を生成
             </button>
           </div>
         </div>
 
+        {/* 生成結果 */}
         {imageUrl && (
           <div className="word-card">
             <div className="word-header">
-              <h2 className="word">シェア</h2>
-              <div style={{ position: 'relative' }}>
-                <button className="share-button" title="コピー" onClick={handleCopy}>
-                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M18 22q-1.25 0-2.125-.875T15 19q0-.175.025-.363t.075-.337L7.2 13.4q-.425.35-.95.55T5 14q-1.25 0-2.125-.875T2 11q0-1.25.875-2.125T5 8q1.05 0 1.9.6L14.8 3.7q-.05-.15-.075-.337T14.7 3q0-1.25.875-2.125T17.7 0q1.25 0 2.125.875T20.7 3q0 1.25-.875 2.125T17.7 6q-1.05 0-1.9-.6L8 10.3q.05.15.075.338T8.1 11q0 .175-.025.363t-.075.337l7.9 4.9q.85-.6 1.9-.6q1.25 0 2.125.875T20.7 19q0 1.25-.875 2.125T17.7 22Z"/></svg>
-                </button>
-                {feedback && <div className="share-feedback">{feedback}</div>}
-              </div>
+              <h2 className="word">生成結果</h2>
             </div>
             <div className="definition">
-              <img src={imageUrl} alt="" style={{ width: '100%', borderRadius: '4px', border: '1px solid var(--color-border)' }} />
-              <p style={{ marginTop: '1.5rem' }}><strong>シェア用URL:</strong></p>
-              <input 
-                id="search-input" 
-                type="text" 
-                value={shareUrl} 
-                readOnly 
-                style={{ borderRadius: '4px', width: '100%', backgroundColor: '#f8f9fa' }} 
-              />
+              <div style={{ marginBottom: '1.5rem' }}>
+                <label htmlFor="api-url-output" style={{ fontWeight: 'bold', display: 'block', marginBottom: '0.5rem' }}>生成されたAPIエンドポイントURL</label>
+                <input 
+                  id="api-url-output" 
+                  type="text" 
+                  value={imageUrl} 
+                  readOnly 
+                  style={{ borderRadius: '4px', width: '100%', backgroundColor: '#f8f9fa' }} 
+                />
+              </div>
+
+              <div style={{ marginBottom: '2rem' }}>
+                <label style={{ fontWeight: 'bold', display: 'block', marginBottom: '0.5rem' }}>画像プレビュー</label>
+                <img src={imageUrl} alt="生成されたOGP画像" style={{ width: '100%', borderRadius: '4px', border: '1px solid var(--color-border)', minHeight: '100px', backgroundColor: '#eee' }} />
+              </div>
+
+              <div>
+                <label htmlFor="share-url-output" style={{ fontWeight: 'bold', display: 'block', marginBottom: '0.5rem' }}>共有用ページのURL</label>
+                <div style={{ position: 'relative', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                  <input 
+                    id="share-url-output" 
+                    type="text" 
+                    value={shareUrl} 
+                    readOnly 
+                    style={{ borderRadius: '4px', width: '100%', backgroundColor: '#f8f9fa', flex: 1 }} 
+                  />
+                  <button className="share-button" title="URLをコピー" onClick={() => handleCopy(shareUrl)}>
+                    <svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 -960 960 960" width="24" fill="currentColor"><path d="M360-240q-33 0-56.5-23.5T280-320v-480q0-33 23.5-56.5T360-880h360q33 0 56.5 23.5T800-800v480q0 33-23.5 56.5T720-240H360Zm0-80h360v-480H360v480ZM200-80q-33 0-56.5-23.5T120-160v-560h80v560h440v80H200Zm160-160v-480 480Z"/></svg>
+                  </button>
+                  {feedback && <div className="share-feedback" style={{ right: '50px' }}>{feedback}</div>}
+                </div>
+              </div>
+
             </div>
           </div>
         )}
