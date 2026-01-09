@@ -1,9 +1,7 @@
 import { ImageResponse } from '@vercel/og';
 import { NextRequest } from 'next/server';
-import fs from 'fs';
-import path from 'path';
 
-export const runtime = 'nodejs';
+export const runtime = 'edge';
 
 export async function GET(req: NextRequest) {
   const { searchParams } = req.nextUrl;
@@ -15,14 +13,9 @@ export async function GET(req: NextRequest) {
     return new Response('Error: `word` と `define` パラメータを指定してください', { status: 400 });
   }
 
-  let fontData;
-  try {
-    const fontPath = path.join(process.cwd(), 'public', 'fonts', 'NotoSansJP-Bold.ttf');
-    fontData = fs.readFileSync(fontPath);
-  } catch (e) {
-    console.error('Font load error:', e);
-    return new Response('Font not found. Please check public/fonts/ path.', { status: 500 });
-  }
+  const fontData = await fetch(
+    new URL('https://github.com/googlefonts/noto-cjk/raw/main/Sans/OTF/Japanese/NotoSansCJKjp-Bold.otf')
+  ).then((res) => res.arrayBuffer());
 
   return new ImageResponse(
     (
